@@ -5,6 +5,7 @@ from typing import Any
 
 from meal_max.utils.sql_utils import get_db_connection
 from meal_max.utils.logger import configure_logger
+from meal_max.utils.random_utils import get_random
 
 
 logger = logging.getLogger(__name__)
@@ -218,6 +219,40 @@ def get_meal_by_name(meal_name: str) -> Meal:
         logger.error("Database error: %s", str(e))
         raise e
 
+def get_random_meal() -> Meal:
+    """
+    Retrieves a random meal from the database.
+
+    Returns:
+        Meal: A randomly selected Meal object.
+
+    Raises:
+        ValueError: If the database is empty.
+    """
+    try:
+        leaderboard = get_leaderboard()
+
+        if not leaderboard:
+            logger.info("Cannot retrieve random meal because the meal database is empty.")
+            raise ValueError("The meal database is empty.")
+
+        # Get a random index using the random.org API
+        random_index = get_random(len(leaderboard))
+        logger.info("Random index selected: %d (total meals: %d)", random_index, len(leaderboard))
+
+        # Return the meal at the random index, adjust for 0-based indexing
+        meal_data = leaderboard[random_index - 1]
+        return Meal(
+            id=meal_data["id"],
+            meal=meal_data["meal"],
+            cuisine=meal_data["cuisine"],
+            price=meal_data["price"],
+            difficulty=meal_data["difficulty"],
+        )
+
+    except Exception as e:
+        logger.error("Error while retrieving random meal: %s", str(e))
+        raise e
 
 def update_meal_stats(meal_id: int, result: str) -> None:
     """

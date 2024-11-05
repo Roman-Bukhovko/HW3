@@ -203,7 +203,7 @@ def test_get_song_by_compound_key(mock_cursor):
     mock_cursor.fetchone.return_value = (1, "Artist Name", "Song Title", 2022, "Pop", 180, False)
 
     # Call the function and check the result
-    result = get_song_by_compound_key("Artist Name", "Song Title", 2022)
+    result = get_song_by_    ("Artist Name", "Song Title", 2022)
 
     # Expected result based on the simulated fetchone return value
     expected_result = Song(1, "Artist Name", "Song Title", 2022, "Pop", 180)
