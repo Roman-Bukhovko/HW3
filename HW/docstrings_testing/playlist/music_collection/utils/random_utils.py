@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 configure_logger(logger)
 
 
-def get_random(num_songs: int) -> int:
+def get_random(num_meals: int) -> int:
     """
     Fetches a random int between 1 and the number of songs in the catalog from random.org.
 
@@ -18,7 +18,7 @@ def get_random(num_songs: int) -> int:
         RuntimeError: If the request to random.org fails or returns an invalid response.
         ValueError: If the response from random.org is not a valid float.
     """
-    url = f"https://www.random.org/integers/?num=1&min=1&max={num_songs}&col=1&base=10&format=plain&rnd=new"
+    url = f"https://www.random.org/integers/?num=1&min=1&max={num_meals}&col=1&base=10&format=plain&rnd=new"
 
     try:
         # Log the request to random.org
