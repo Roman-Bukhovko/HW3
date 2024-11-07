@@ -71,14 +71,14 @@ create_meal() {
 }
 
 delete_meal_by_id() {
-  meal_id=$1
+  id=$1
 
-  echo "Deleting meal by ID ($meal_id)..."
-  response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$meal_id")
+  echo "Deleting meal by ID ($id)..."
+  response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$id")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal deleted successfully by ID ($meal_id)."
+    echo "Meal deleted successfully by ID ($id)."
   else
-    echo "Failed to delete meal by ID ($meal_id)."
+    echo "Failed to delete meal by ID ($id)."
     exit 1
   fi
 }
@@ -99,18 +99,18 @@ get_all_meals() {
 }
 
 get_meal_by_id() {
-  meal_id=$1
+  id=$1
 
-  echo "Getting meal by ID ($meal_id)..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-by-id/$meal_id")
+  echo "Getting meal by ID ($id)..."
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-id/$id")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal retrieved successfully by ID ($meal_id)."
+    echo "Meal retrieved successfully by ID ($id)."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Meal JSON (ID $meal_id):"
+      echo "Meal JSON (ID $id):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get meal by ID ($meal_id)."
+    echo "Failed to get meal by ID ($id)."
     exit 1
   fi
 }
@@ -219,11 +219,9 @@ check_health
 check_db
 
 # Create meals
-create_meal "Borscht" "Ukranian" 10.99 "MED"
+create_meal "Borscht" "Ukrainian" 10.99 "MED"
 create_meal "Sushi" "Japanese" 12.99 "HIGH"
 create_meal "Burger" "American" 9.99 "LOW"
-
-get_leaderboard
 
 delete_meal_by_id 2
 get_all_meals
@@ -231,5 +229,7 @@ get_all_meals
 get_meal_by_id 1
 get_meal_by_name "Borscht"
 get_random_meal
+
+get_leaderboard
 
 echo "All tests passed successfully!"
