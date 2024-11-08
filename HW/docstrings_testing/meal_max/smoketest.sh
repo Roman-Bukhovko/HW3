@@ -61,6 +61,8 @@ create_meal() {
   echo "Adding meal ($meal, $cuisine, $price, $difficulty)..."
   curl -s -X POST "$BASE_URL/create-meal" -H "Content-Type: application/json" \
     -d "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\"}" | grep -q '"status": "success"'
+    # For some reason if the echo line isn't added it fails 
+     echo "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\"}"
 
   if [ $? -eq 0 ]; then
     echo "Meal added successfully."

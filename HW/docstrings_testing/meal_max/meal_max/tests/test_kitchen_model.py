@@ -313,9 +313,9 @@ def test_get_random_meal(mock_cursor, mocker):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6),
-        (2, "Meal B", "Cuisine B", 9.99, "MED", 4, 2, 0.5),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4)
+        (1, "Meal A", "Cuisine A", 8.99, "LOW", 5),
+        (2, "Meal B", "Cuisine B", 9.99, "MED", 4),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 10)
     ]
 
     # Mock random number generation to return the 2nd meal
@@ -326,7 +326,7 @@ def test_get_random_meal(mock_cursor, mocker):
     result = get_random_meal()
 
     # Expected result based on the mock random number and fetchall return value
-    expected_result = Meal(2, "Meal B", "Cuisine B", 9.99, "MED", 4, 2)
+    expected_result = Meal(2, "Meal B", "Cuisine B", 9.99, "MED", 4)
 
     # Ensure the result matches the expected output
     assert result == expected_result, f"Expected {expected_result}, got {result}"
@@ -367,9 +367,10 @@ def test_update_meal_stats(mock_cursor):
     # Simulate that the meal exists and is not deleted (id = 1)
     mock_cursor.fetchone.return_value = [False]
 
-    # Call the update_play_count function with a sample meal ID
+    # Call the update_meal_stats function with a sample meal ID
     meal_id = 1
-    update_meal_stats(meal_id)
+    res = "WIN"
+    update_meal_stats(meal_id, res)
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
