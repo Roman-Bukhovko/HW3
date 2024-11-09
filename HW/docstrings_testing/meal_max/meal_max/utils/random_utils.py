@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 configure_logger(logger)
 
 
-def get_random() -> float:
+def get_random(num_meals: int) -> int:
     """
-    Fetches a random int between 1 and the number of songs in the catalog from random.org.
+    Fetches a random int between 1 and the number of meals in the database from random.org.
 
     Returns:
         int: The random number fetched from random.org.

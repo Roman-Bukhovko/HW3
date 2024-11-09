@@ -81,14 +81,14 @@ def test_create_meal_duplicate(mock_cursor):
     mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: meals.meal")
 
     # Expect the function to raise a ValueError with a specific message when handling the IntegrityError
-    with pytest.raises(ValueError, match="Meal with name 'Meal Name' already exists."):
+    with pytest.raises(ValueError, match="Meal with name 'Meal Name' already exists"):
         create_meal(meal="Meal Name", cuisine="Cuisine Type", price=8.99, difficulty="LOW")
 
 def test_create_meal_invalid_price():
     """Test error when trying to create a meal with an invalid price (e.g., negative price)"""
 
     # Attempt to create a meal with a negative duration
-    with pytest.raises(ValueError, match="Invalid price: -8.99 \(must be a positive integer\)."):
+    with pytest.raises(ValueError, match="Invalid price: -8.99. Price must be a positive number."):
         create_meal(meal="Meal Name", cuisine="Cuisine Type", price=-8.99, difficulty="LOW")
 
     # Attempt to create a meal with a non-integer duration
@@ -99,7 +99,7 @@ def test_create_meal_invalid_difficulty():
     """Test error when trying to create a meal with an invalid difficulty."""
 
     # Attempt to create a meal with an invalid difficulty
-    with pytest.raises(ValueError, match="Invalid difficulty provided: invalid \(must be 'LOW', 'MED', or 'HIGH'\)."):
+    with pytest.raises(ValueError, match="Invalid difficulty level: invalid. Must be 'LOW', 'MED', or 'HIGH'."):
         create_meal(meal="Meal Name", cuisine="Cuisine Type", price=0, difficulty="INVALID")
 
 def test_delete_meal(mock_cursor):
@@ -150,7 +150,7 @@ def test_delete_meal_already_deleted(mock_cursor):
     mock_cursor.fetchone.return_value = ([True])
 
     # Expect a ValueError when attempting to delete a meal that's already been deleted
-    with pytest.raises(ValueError, match="Meal with ID 999 has already been deleted"):
+    with pytest.raises(ValueError, match="Meal with ID 999 has been deleted"):
         delete_meal(999)
 
 ######################################################
@@ -226,9 +226,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6, False),
-        (2, "Meal B", "Cuisine B", 9.99, "MED", 4, 2, 0.5, False),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4, False)
+        (1, "Meal A", "Cuisine A", 8.99, "LOW", False),
+        (2, "Meal B", "Cuisine B", 9.99, "MED", False),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH", False)
     ]
 
     # Call the get_leaderboard function
@@ -236,16 +236,16 @@ def test_get_leaderboard(mock_cursor):
 
     # Ensure the results match the expected output
     expected_result = [
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 5, "wins": 3, "win_pct": 0.6},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 4, "wins": 2, "win_pct": 0.5},
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 10, "wins": 4, "win_pct": 0.4}
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW"},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED"},
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH"}
     ]
 
     assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
 
     # Ensure the SQL query was executed correctly
     expected_query = normalize_whitespace("""
-        SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct
+        SELECT id, meal, cuisine, price, difficulty
         FROM meals
         WHERE deleted = FALSE
     """)
@@ -355,7 +355,7 @@ def test_get_random_meal_empty(mock_cursor, mocker):
     mocker.patch("meal_max.models.kitchen_model.get_random").assert_not_called()
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins FROM meals WHERE deleted = FALSE")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals WHERE deleted = FALSE")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct

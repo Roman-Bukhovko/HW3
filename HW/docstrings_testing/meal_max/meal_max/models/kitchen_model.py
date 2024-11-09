@@ -218,7 +218,9 @@ def get_meal_by_name(meal_name: str) -> Meal:
     except sqlite3.Error as e:
         logger.error("Database error: %s", str(e))
         raise e
+"""
 
+"""
 def get_random_meal() -> Meal:
     """
     Retrieves a random meal from the database.
