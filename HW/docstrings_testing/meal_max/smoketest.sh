@@ -77,6 +77,8 @@ delete_meal_by_id() {
 
   echo "Deleting meal by ID ($id)..."
   response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$id")
+  echo "Response: $response" 
+
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal deleted successfully by ID ($id)."
   else
@@ -225,6 +227,7 @@ create_meal "Borscht" "Ukrainian" 10.99 "MED"
 create_meal "Sushi" "Japanese" 12.99 "HIGH"
 create_meal "Burger" "American" 9.99 "LOW"
 
+get_meal_by_id 2
 delete_meal_by_id 2
 get_all_meals
 
