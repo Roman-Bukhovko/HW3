@@ -92,8 +92,8 @@ def test_create_meal_invalid_price():
         create_meal(meal="Meal Name", cuisine="Cuisine Type", price=-8.99, difficulty="LOW")
 
     # Attempt to create a meal with a non-integer duration
-    with pytest.raises(ValueError, match="Invalid price: invalid \(must be a positive integer\)."):
-        create_meal(meal="Meal Name", cuisine="Cuisine Type", price=0, difficulty="LOW")
+    with pytest.raises(ValueError, match="Invalid price: a. Price must be a positive number."):
+        create_meal(meal="Meal Name", cuisine="Cuisine Type", price="a", difficulty="LOW")
 
 def test_create_meal_invalid_difficulty():
     """Test error when trying to create a meal with an invalid difficulty."""
@@ -218,7 +218,7 @@ def test_get_meal_by_name(mock_cursor):
     actual_arguments = mock_cursor.execute.call_args[0][1]
 
     # Assert that the SQL query was executed with the correct arguments
-    expected_arguments = ("Meal Name")
+    expected_arguments = ("Meal Name",)
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 def test_get_leaderboard(mock_cursor):
@@ -286,7 +286,7 @@ def test_get_all_meals_ordered(mock_cursor):
     ]
 
     # Call the get_leaderboard function with sort_by = True
-    meals = get_leaderboard(sort_by=True)
+    meals = get_leaderboard(sort_by="wins")
 
     # Ensure the results are sorted by wins
     expected_result = [
@@ -313,9 +313,9 @@ def test_get_random_meal(mock_cursor, mocker):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW", 5),
-        (2, "Meal B", "Cuisine B", 9.99, "MED", 4),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 10)
+        (1, "Meal A", "Cuisine A", 8.99, "LOW"),
+        (2, "Meal B", "Cuisine B", 9.99, "MED"),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH")
     ]
 
     # Mock random number generation to return the 2nd meal
@@ -326,7 +326,7 @@ def test_get_random_meal(mock_cursor, mocker):
     result = get_random_meal()
 
     # Expected result based on the mock random number and fetchall return value
-    expected_result = Meal(2, "Meal B", "Cuisine B", 9.99, "MED", 4)
+    expected_result = Meal(2, "Meal B", "Cuisine B", 9.99, "MED")
 
     # Ensure the result matches the expected output
     assert result == expected_result, f"Expected {expected_result}, got {result}"
@@ -369,8 +369,7 @@ def test_update_meal_stats(mock_cursor):
 
     # Call the update_meal_stats function with a sample meal ID
     meal_id = 1
-    res = "WIN"
-    update_meal_stats(meal_id, res)
+    update_meal_stats(meal_id, res = "win")
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
@@ -399,7 +398,7 @@ def test_update_wins_deleted_meal(mock_cursor):
 
     # Expect a ValueError when attempting to update a deleted meal
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
-        update_meal_stats(1)
+        update_meal_stats(1, result="win")
 
     # Ensure that no SQL query for updating play count was executed
     mock_cursor.execute.assert_called_once_with("SELECT deleted FROM meals WHERE id = ?", (1,))

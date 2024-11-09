@@ -132,22 +132,26 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
             cursor.execute(query)
             rows = cursor.fetchall()
 
-        leaderboard = []
-        for row in rows:
-            meal = {
-                'id': row[0],
-                'meal': row[1],
-                'cuisine': row[2],
-                'price': row[3],
-                'difficulty': row[4],
-                'battles': row[5],
-                'wins': row[6],
-                'win_pct': round(row[7] * 100, 1)  # Convert to percentage
-            }
-            leaderboard.append(meal)
+            if not rows:
+                logger.warning("The leaderboard is empty.")
+                return []
 
-        logger.info("Leaderboard retrieved successfully")
-        return leaderboard
+            leaderboard = []
+            for row in rows:
+                meal = {
+                    'id': row[0],
+                    'meal': row[1],
+                    'cuisine': row[2],
+                    'price': row[3],
+                    'difficulty': row[4],
+                    'battles': row[5],
+                    'wins': row[6],
+                    'win_pct': round(row[7] * 100, 1)  # Convert to percentage
+                }
+                leaderboard.append(meal)
+
+            logger.info("Leaderboard retrieved successfully")
+            return leaderboard
 
     except sqlite3.Error as e:
         logger.error("Database error: %s", str(e))
