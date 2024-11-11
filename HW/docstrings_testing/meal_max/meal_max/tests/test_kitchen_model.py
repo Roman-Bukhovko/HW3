@@ -89,18 +89,18 @@ def test_create_meal_invalid_price():
 
     # Attempt to create a meal with a negative duration
     with pytest.raises(ValueError, match="Invalid price: -8.99. Price must be a positive number."):
-        create_meal(meal="Meal Name", cuisine="Cuisine Type", price=-8.99, difficulty="LOW")
+        create_meal("Meal Name", "Cuisine Type", -8.99, "LOW")
 
     # Attempt to create a meal with a non-integer duration
     with pytest.raises(ValueError, match="Invalid price: a. Price must be a positive number."):
-        create_meal(meal="Meal Name", cuisine="Cuisine Type", price="a", difficulty="LOW")
+        create_meal("Meal Name", "Cuisine Type", "a", "LOW")
 
 def test_create_meal_invalid_difficulty():
     """Test error when trying to create a meal with an invalid difficulty."""
 
     # Attempt to create a meal with an invalid difficulty
     with pytest.raises(ValueError, match="Invalid difficulty level: invalid. Must be 'LOW', 'MED', or 'HIGH'."):
-        create_meal(meal="Meal Name", cuisine="Cuisine Type", price=0, difficulty="INVALID")
+        create_meal("Meal Name", "Cuisine Type", 0, "INVALID")
 
 def test_delete_meal(mock_cursor):
     """Test soft deleting a meal from the database by meal ID."""
@@ -226,9 +226,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW", False),
-        (2, "Meal B", "Cuisine B", 9.99, "MED", False),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH", False)
+        (1, "Meal A", "Cuisine A", 8.99, "LOW"),
+        (2, "Meal B", "Cuisine B", 9.99, "MED"),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH")
     ]
 
     # Call the get_leaderboard function
