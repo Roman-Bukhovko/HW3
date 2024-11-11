@@ -73,16 +73,16 @@ create_meal() {
 }
 
 delete_meal_by_id() {
-  id=$1
+  meal_id=$1
 
-  echo "Deleting meal by ID ($id)..."
-  response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$id")
+  echo "Deleting meal by ID ($meal_id)..."
+  response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$meal_id")
   echo "Response: $response" 
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal deleted successfully by ID ($id)."
+    echo "Meal deleted successfully by ID ($meal_id)."
   else
-    echo "Failed to delete meal by ID ($id)."
+    echo "Failed to delete meal by ID ($meal_id)."
     exit 1
   fi
 }
@@ -103,18 +103,18 @@ get_all_meals() {
 }
 
 get_meal_by_id() {
-  id=$1
+  meal_id=$1
 
-  echo "Getting meal by ID ($id)..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-by-id/$id")
+  echo "Getting meal by ID ($meal_id)..."
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-id/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal retrieved successfully by ID ($id)."
+    echo "Meal retrieved successfully by ID ($meal_id)."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Meal JSON (ID $id):"
+      echo "Meal JSON (ID $meal_id):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get meal by ID ($id)."
+    echo "Failed to get meal by ID ($meal_id)."
     exit 1
   fi
 }
@@ -203,8 +203,8 @@ move_meal_to_bottom() {
 
 # Function to get the meal leaderboard 
 get_leaderboard() {
-  echo "Getting meak leaderboard..."
-  response=$(curl -s -X GET "$BASE_URL/get-leaderboard")
+  echo "Getting meal leaderboard..."
+  response=$(curl -s -X GET "$BASE_URL/leaderboard?sort=wins")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Leaderboard retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then

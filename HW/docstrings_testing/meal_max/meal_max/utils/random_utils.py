@@ -7,12 +7,12 @@ logger = logging.getLogger(__name__)
 configure_logger(logger)
 
 
-def get_random(num_meals: int) -> int:
+def get_random() -> float:
     """
-    Fetches a random int between 1 and the number of meals in the database from random.org.
+    Fetches a random decimal number from random.org.
 
     Returns:
-        int: The random number fetched from random.org.
+        float: The random number fetched from random.org.
 
     Raises:
         RuntimeError: If the request to random.org fails or returns an invalid response.
