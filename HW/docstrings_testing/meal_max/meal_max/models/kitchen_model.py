@@ -114,14 +114,12 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
         Warning: If the database is empty.
     """
     query = """
-        SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct
-        FROM meals WHERE deleted = false AND battles > 0
+        SELECT id, meal, cuisine, price, difficulty
+        FROM meals WHERE deleted = false
     """
 
-    if sort_by == "win_pct":
-        query += " ORDER BY win_pct DESC"
-    elif sort_by == "wins":
-        query += " ORDER BY wins DESC"
+    if sort_by == "price":
+        query += " ORDER BY price DESC"
     else:
         logger.error("Invalid sort_by parameter: %s", sort_by)
         raise ValueError("Invalid sort_by parameter: %s" % sort_by)

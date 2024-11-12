@@ -335,7 +335,7 @@ def test_get_random_meal(mock_cursor, mocker):
     mock_random.assert_called_once_with(3)
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins FROM meals WHERE deleted = FALSE")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals WHERE deleted = FALSE")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct
@@ -369,11 +369,11 @@ def test_update_meal_stats(mock_cursor):
 
     # Call the update_meal_stats function with a sample meal ID
     meal_id = 1
-    update_meal_stats(meal_id, res = "win")
+    update_meal_stats(meal_id, 8.99)
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
-        UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = (wins + 1) * 1.0 / (battles + 1) WHERE id = ?
+        UPDATE meals SET price = price + 1 WHERE id = ?
     """)
 
     # Ensure the SQL query was executed correctly
@@ -398,7 +398,7 @@ def test_update_wins_deleted_meal(mock_cursor):
 
     # Expect a ValueError when attempting to update a deleted meal
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
-        update_meal_stats(1, result="win")
+        update_meal_stats(1, price=8.99)
 
     # Ensure that no SQL query for updating play count was executed
     mock_cursor.execute.assert_called_once_with("SELECT deleted FROM meals WHERE id = ?", (1,))
