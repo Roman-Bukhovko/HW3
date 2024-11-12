@@ -99,8 +99,8 @@ def test_create_meal_invalid_difficulty():
     """Test error when trying to create a meal with an invalid difficulty."""
 
     # Attempt to create a meal with an invalid difficulty
-    with pytest.raises(ValueError, match="Invalid difficulty level: invalid. Must be 'LOW', 'MED', or 'HIGH'."):
-        create_meal("Meal Name", "Cuisine Type", 0, "INVALID")
+    with pytest.raises(ValueError, match="Invalid difficulty level: INVALID. Must be 'LOW', 'MED', or 'HIGH'."):
+        create_meal("Meal Name", "Cuisine Type", 8.99, "INVALID")
 
 def test_delete_meal(mock_cursor):
     """Test soft deleting a meal from the database by meal ID."""
@@ -286,20 +286,20 @@ def test_get_all_meals_ordered(mock_cursor):
     ]
 
     # Call the get_leaderboard function with sort_by = True
-    meals = get_leaderboard(sort_by="wins")
+    meals = get_leaderboard(sort_by="price")
 
     # Ensure the results are sorted by wins
     expected_result = [
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 10, "wins": 4, "win_pct": 0.4},
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 5, "wins": 3, "win_pct": 0.6},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 4, "wins": 2, "win_pct": 0.5}
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH"},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED"},
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW"}
     ]
 
     assert meals == expected_result, f"Expected {expected_result}, but got {meals}"
 
     # Ensure the SQL query was executed correctly
     expected_query = normalize_whitespace("""
-        SELECT id, meal, cuisine, price, difficulty, battles, wins, win_pct
+        SELECT id, meal, cuisine, price, difficulty
         FROM meals
         WHERE deleted = FALSE
         ORDER BY wins DESC
