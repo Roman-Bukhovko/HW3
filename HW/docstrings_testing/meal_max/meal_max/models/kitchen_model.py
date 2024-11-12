@@ -143,10 +143,7 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
                     'meal': row[1],
                     'cuisine': row[2],
                     'price': row[3],
-                    'difficulty': row[4],
-                    'battles': row[5],
-                    'wins': row[6],
-                    'win_pct': round(row[7] * 100, 1)  # Convert to percentage
+                    'difficulty': row[4]
                 }
                 leaderboard.append(meal)
 
@@ -260,7 +257,7 @@ def get_random_meal() -> Meal:
         logger.error("Error while retrieving random meal: %s", str(e))
         raise e
 
-def update_meal_stats(meal_id: int, result: str) -> None:
+def update_meal_stats(meal_id: int, price: float) -> None:
     """
     Increments the battles of a meal by meal ID.
 
@@ -285,12 +282,10 @@ def update_meal_stats(meal_id: int, result: str) -> None:
                 logger.info("Meal with ID %s not found", meal_id)
                 raise ValueError(f"Meal with ID {meal_id} not found")
 
-            if result == 'win':
-                cursor.execute("UPDATE meals SET battles = battles + 1, wins = wins + 1 WHERE id = ?", (meal_id,))
-            elif result == 'loss':
-                cursor.execute("UPDATE meals SET battles = battles + 1 WHERE id = ?", (meal_id,))
+            if price >= 0.00:
+                cursor.execute("UPDATE meals SET price = {price} WHERE id = ?", (meal_id,))
             else:
-                raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
+                raise ValueError(f"Invalid price: {price}. Expected positive number.")
 
             conn.commit()
 
