@@ -114,12 +114,16 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
         Warning: If the database is empty.
     """
     query = """
-        SELECT id, meal, cuisine, price, difficulty
-        FROM meals WHERE deleted = false
+        SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct
+        FROM meals WHERE deleted = false AND battles > 0
     """
 
-    if sort_by == "price":
-        query += " ORDER BY price DESC"
+    if sort_by == "win_pct":
+        query += " ORDER BY win_pct DESC"
+    elif sort_by == "wins":
+        query += " ORDER BY wins DESC"
+    elif sort_by == "price":
+        query += "ORDER BY price DESC"
     else:
         logger.error("Invalid sort_by parameter: %s", sort_by)
         raise ValueError("Invalid sort_by parameter: %s" % sort_by)
@@ -255,7 +259,7 @@ def get_random_meal() -> Meal:
         logger.error("Error while retrieving random meal: %s", str(e))
         raise e
 
-def update_meal_stats(meal_id: int, price: float) -> None:
+def update_meal_stats(meal_id: int, result: str) -> None:
     """
     Increments the battles of a meal by meal ID.
 
@@ -280,10 +284,12 @@ def update_meal_stats(meal_id: int, price: float) -> None:
                 logger.info("Meal with ID %s not found", meal_id)
                 raise ValueError(f"Meal with ID {meal_id} not found")
 
-            if price >= 0.00:
-                cursor.execute("UPDATE meals SET price = {price} WHERE id = ?", (meal_id,))
+            if result == "win":
+                cursor.execute("UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 100 WHERE id = ?", (meal_id,))
+            elif result == "loss":
+                cursor.execute("UPDATE meals SET loss = loss + 1, battles = battles + 1, win_pct = wins/battles * 100  WHERE id = ?", (meal_id,))
             else:
-                raise ValueError(f"Invalid price: {price}. Expected positive number.")
+                raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
 
             conn.commit()
 
