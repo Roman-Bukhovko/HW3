@@ -258,8 +258,7 @@ prep_combatant "Tacos" "Mexican" 2.99 "LOW"
 
 get_combatants
 
-battle
-
+battle 
 
 # Create meals
 create_meal "Borscht" "Ukrainian" 10.99 "MED"

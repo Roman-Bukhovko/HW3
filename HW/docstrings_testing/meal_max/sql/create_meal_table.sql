@@ -7,5 +7,7 @@ CREATE TABLE meals (
     difficulty TEXT CHECK(difficulty IN ('HIGH', 'MED', 'LOW')),
     battles INTEGER DEFAULT 0,
     wins INTEGER DEFAULT 0,
+    win_pct REAL DEFAULT 0.0, 
+    loss INTEGER DEFAULT 0,
     deleted BOOLEAN DEFAULT FALSE
 );
