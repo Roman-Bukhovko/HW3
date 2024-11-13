@@ -238,7 +238,7 @@ def get_random_meal() -> Meal:
         ValueError: If the database is empty.
     """
     try:
-        leaderboard = get_leaderboard()
+        leaderboard = get_leaderboard("wins")
 
         if not leaderboard:
             logger.info("Cannot retrieve random meal because the meal database is empty.")
@@ -292,7 +292,7 @@ def update_meal_stats(meal_id: int, result: str) -> None:
             elif result == "loss":
                 cursor.execute("UPDATE meals SET loss = loss + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
             else:
-                raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
+                raise ValueError(f"Invalid result: {result}. Expected 'wins' or 'loss'.")
 
             conn.commit()
 

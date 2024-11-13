@@ -232,7 +232,7 @@ def test_get_leaderboard(mock_cursor):
     ]
 
     # Call the get_leaderboard function
-    leaderboard = get_leaderboard()
+    leaderboard = get_leaderboard("wins")
 
     # Ensure the results match the expected output
     expected_result = [
@@ -260,7 +260,7 @@ def test_get_leaderboard_empty(mock_cursor, caplog):
     mock_cursor.fetchall.return_value = []
 
     # Call the get_leaderboard function
-    result = get_leaderboard()
+    result = get_leaderboard("wins")
 
     # Ensure the result is an empty list
     assert result == [], f"Expected empty list, but got {result}"
@@ -286,7 +286,7 @@ def test_get_all_meals_ordered(mock_cursor):
     ]
 
     # Call the get_leaderboard function with sort_by = True
-    meals = get_leaderboard(sort_by="win")
+    meals = get_leaderboard(sort_by="wins")
 
     # Ensure the results are sorted by wins
     expected_result = [
@@ -335,7 +335,7 @@ def test_get_random_meal(mock_cursor, mocker):
     mock_random.assert_called_once_with(3)
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct FROM meals WHERE deleted = false AND battles > 0 ORDER BY wins DESC")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct
