@@ -256,6 +256,9 @@ def get_random_meal() -> Meal:
             cuisine=meal_data["cuisine"],
             price=meal_data["price"],
             difficulty=meal_data["difficulty"],
+            battles=meal_data["battles"],
+            wins=meal_data["wins"],
+            win_pct=meal_data["win_pct"]
         )
 
     except Exception as e:
@@ -287,10 +290,8 @@ def update_meal_stats(meal_id: int, result: str) -> None:
                 logger.info("Meal with ID %s not found", meal_id)
                 raise ValueError(f"Meal with ID {meal_id} not found")
 
-            if result == "win":
+            if result == "wins":
                 cursor.execute("UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
-            elif result == "loss":
-                cursor.execute("UPDATE meals SET loss = loss + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
             else:
                 raise ValueError(f"Invalid result: {result}. Expected 'wins' or 'loss'.")
 

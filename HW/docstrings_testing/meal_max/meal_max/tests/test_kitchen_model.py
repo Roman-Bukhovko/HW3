@@ -369,11 +369,11 @@ def test_update_meal_stats(mock_cursor):
 
     # Call the update_meal_stats function with a sample meal ID
     meal_id = 1
-    update_meal_stats(meal_id, "win")
+    update_meal_stats(meal_id, "wins")
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
-        UPDATE meals SET price = price + 1 WHERE id = ?
+        UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?
     """)
 
     # Ensure the SQL query was executed correctly
