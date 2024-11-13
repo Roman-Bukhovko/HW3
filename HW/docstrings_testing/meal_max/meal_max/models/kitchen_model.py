@@ -100,7 +100,7 @@ def delete_meal(meal_id: int) -> None:
         logger.error("Database error: %s", str(e))
         raise e
 
-def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
+def get_leaderboard(sort_by: str) -> dict[str, Any]:
     """
     Retrieves all meals that are not marked as deleted from the database.
 
@@ -146,10 +146,7 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
                         'meal': row[1],
                         'cuisine': row[2],
                         'price': row[3],
-                        'difficulty': row[4],
-                        "battles": row[5],
-                        "wins": row[6],
-                        "win_pct": row[7]
+                        'difficulty': row[4]
                     }
                 ]
                 leaderboard.append(meal)
@@ -240,7 +237,7 @@ def get_random_meal() -> Meal:
         ValueError: If the database is empty.
     """
     try:
-        leaderboard = get_leaderboard("wins")
+        leaderboard = get_leaderboard("price")
 
         if not leaderboard:
             logger.info("Cannot retrieve random meal because the meal database is empty.")
@@ -257,10 +254,7 @@ def get_random_meal() -> Meal:
             meal=meal_data["meal"],
             cuisine=meal_data["cuisine"],
             price=meal_data["price"],
-            difficulty=meal_data["difficulty"],
-            battles=meal_data["battles"],
-            wins=meal_data["wins"],
-            win_pct=meal_data["win_pct"]
+            difficulty=meal_data["difficulty"]
         )
 
     except Exception as e:

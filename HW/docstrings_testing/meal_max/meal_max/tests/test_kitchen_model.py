@@ -280,9 +280,9 @@ def test_get_all_meals_ordered(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        {3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4, "false"},
-        {1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6, "false"},
-        {2, "Meal B", "Cuisine B", 9.99, "MED",  4, 2, 0.5, "false"}
+        {3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4},
+        {1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6},
+        {2, "Meal B", "Cuisine B", 9.99, "MED",  4, 2, 0.5}
     ]
 
     # Call the get_leaderboard function with sort_by = True
@@ -290,9 +290,9 @@ def test_get_all_meals_ordered(mock_cursor):
 
     # Ensure the results are sorted by wins
     expected_result = [
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 10, "wins": 4, "win_pct": 0.4, "deleted": "false"},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 3, "win_pct": 0.6, "deleted": "false"},
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 4, "wins":  2, "win_pct": 0.5, "deleted": "false"}
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 10, "wins": 4, "win_pct": 0.4},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 3, "win_pct": 0.6},
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 4, "wins":  2, "win_pct": 0.5}
     ]
 
     assert meals == expected_result, f"Expected {expected_result}, but got {meals}"
