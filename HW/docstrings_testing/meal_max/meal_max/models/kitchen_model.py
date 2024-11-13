@@ -250,11 +250,11 @@ def get_random_meal() -> Meal:
         # Return the meal at the random index, adjust for 0-based indexing
         meal_data = leaderboard[random_index - 1]
         return Meal(
-            id=meal_data["id"],
-            meal=meal_data["meal"],
-            cuisine=meal_data["cuisine"],
-            price=meal_data["price"],
-            difficulty=meal_data["difficulty"]
+            id=meal_data[0],
+            meal=meal_data[1],
+            cuisine=meal_data[2],
+            price=meal_data[3],
+            difficulty=meal_data[4]
         )
 
     except Exception as e:
