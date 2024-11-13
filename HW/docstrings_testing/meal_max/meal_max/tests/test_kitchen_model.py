@@ -226,9 +226,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW", 10, 5, 0.5, "false"),
-        (2, "Meal B", "Cuisine B", 9.99, "MED", 5, 2, 0.4, "false"),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 8, 2, 0.25, "false")
+        (1, "Meal A", "Cuisine A", 8.99, "LOW", 10, 5, 0.5),
+        (2, "Meal B", "Cuisine B", 9.99, "MED", 5, 2, 0.4),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 8, 2, 0.25)
     ]
 
     # Call the get_leaderboard function
@@ -236,9 +236,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Ensure the results match the expected output
     expected_result = [
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 10, "wins": 5, "win_pct": 0.5, "deleted": "false"},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 2, "win_pct": 0.4, "deleted": "false"},
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 8, "wins": 2, "win_pct": 0.25, "deleted": "false"}
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 10, "wins": 5, "win_pct": 0.5},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 2, "win_pct": 0.4},
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 8, "wins": 2, "win_pct": 0.25}
     ]
 
     assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"

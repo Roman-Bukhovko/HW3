@@ -140,16 +140,18 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
 
             leaderboard = []
             for row in rows:
-                meal = {
-                    'id': row[0],
-                    'meal': row[1],
-                    'cuisine': row[2],
-                    'price': row[3],
-                    'difficulty': row[4],
-                    "battles": row[5],
-                    "wins": row[6],
-                    "win_pct": row[7]
-                }
+                meal = [
+                    {
+                        'id': row[0],
+                        'meal': row[1],
+                        'cuisine': row[2],
+                        'price': row[3],
+                        'difficulty': row[4],
+                        "battles": row[5],
+                        "wins": row[6],
+                        "win_pct": row[7]
+                    }
+                ]
                 leaderboard.append(meal)
 
             logger.info("Leaderboard retrieved successfully")
