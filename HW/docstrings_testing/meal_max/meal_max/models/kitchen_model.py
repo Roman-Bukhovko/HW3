@@ -100,7 +100,7 @@ def delete_meal(meal_id: int) -> None:
         logger.error("Database error: %s", str(e))
         raise e
 
-def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
+def get_leaderboard(sort_by: str) -> dict[str, Any]:
     """
     Retrieves all meals that are not marked as deleted from the database.
 
@@ -122,6 +122,8 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
         query += " ORDER BY win_pct DESC"
     elif sort_by == "wins":
         query += " ORDER BY wins DESC"
+    elif sort_by == "price":
+        query += "ORDER BY price DESC"
     else:
         logger.error("Invalid sort_by parameter: %s", sort_by)
         raise ValueError("Invalid sort_by parameter: %s" % sort_by)
@@ -138,13 +140,15 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
 
             leaderboard = []
             for row in rows:
-                meal = {
-                    'id': row[0],
-                    'meal': row[1],
-                    'cuisine': row[2],
-                    'price': row[3],
-                    'difficulty': row[4]
-                }
+                meal = [
+                    {
+                        'id': row[0],
+                        'meal': row[1],
+                        'cuisine': row[2],
+                        'price': row[3],
+                        'difficulty': row[4]
+                    }
+                ]
                 leaderboard.append(meal)
 
             logger.info("Leaderboard retrieved successfully")
@@ -233,7 +237,7 @@ def get_random_meal() -> Meal:
         ValueError: If the database is empty.
     """
     try:
-        leaderboard = get_leaderboard()
+        leaderboard = get_leaderboard("price")
 
         if not leaderboard:
             logger.info("Cannot retrieve random meal because the meal database is empty.")
@@ -246,18 +250,18 @@ def get_random_meal() -> Meal:
         # Return the meal at the random index, adjust for 0-based indexing
         meal_data = leaderboard[random_index - 1]
         return Meal(
-            id=meal_data["id"],
-            meal=meal_data["meal"],
-            cuisine=meal_data["cuisine"],
-            price=meal_data["price"],
-            difficulty=meal_data["difficulty"],
+            id=meal_data[0],
+            meal=meal_data[1],
+            cuisine=meal_data[2],
+            price=meal_data[3],
+            difficulty=meal_data[4]
         )
 
     except Exception as e:
         logger.error("Error while retrieving random meal: %s", str(e))
         raise e
 
-def update_meal_stats(meal_id: int, price: float) -> None:
+def update_meal_stats(meal_id: int, result: str) -> None:
     """
     Increments the battles of a meal by meal ID.
 
@@ -282,10 +286,10 @@ def update_meal_stats(meal_id: int, price: float) -> None:
                 logger.info("Meal with ID %s not found", meal_id)
                 raise ValueError(f"Meal with ID {meal_id} not found")
 
-            if price >= 0.00:
-                cursor.execute("UPDATE meals SET price = {price} WHERE id = ?", (meal_id,))
+            if result == "wins":
+                cursor.execute("UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
             else:
-                raise ValueError(f"Invalid price: {price}. Expected positive number.")
+                raise ValueError(f"Invalid result: {result}. Expected 'wins' or 'loss'.")
 
             conn.commit()
 
