@@ -290,7 +290,7 @@ battle() {
     echo "Battle failed"
     exit 1
   fi
-
+}
 
 # Health checks
 check_health
