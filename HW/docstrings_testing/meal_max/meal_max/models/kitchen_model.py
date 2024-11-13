@@ -145,7 +145,10 @@ def get_leaderboard(sort_by: str="wins") -> dict[str, Any]:
                     'meal': row[1],
                     'cuisine': row[2],
                     'price': row[3],
-                    'difficulty': row[4]
+                    'difficulty': row[4],
+                    "battles": row[5],
+                    "wins": row[6],
+                    "win_pct": row[7]
                 }
                 leaderboard.append(meal)
 
@@ -285,9 +288,9 @@ def update_meal_stats(meal_id: int, result: str) -> None:
                 raise ValueError(f"Meal with ID {meal_id} not found")
 
             if result == "win":
-                cursor.execute("UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 100 WHERE id = ?", (meal_id,))
+                cursor.execute("UPDATE meals SET wins = wins + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
             elif result == "loss":
-                cursor.execute("UPDATE meals SET loss = loss + 1, battles = battles + 1, win_pct = wins/battles * 100  WHERE id = ?", (meal_id,))
+                cursor.execute("UPDATE meals SET loss = loss + 1, battles = battles + 1, win_pct = wins/battles * 1.0 WHERE id = ?", (meal_id,))
             else:
                 raise ValueError(f"Invalid result: {result}. Expected 'win' or 'loss'.")
 

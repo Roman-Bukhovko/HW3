@@ -226,9 +226,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 8.99, "LOW"),
-        (2, "Meal B", "Cuisine B", 9.99, "MED"),
-        (3, "Meal C", "Cuisine C", 10.99, "HIGH")
+        (1, "Meal A", "Cuisine A", 8.99, "LOW", 10, 5, 0.5, "false"),
+        (2, "Meal B", "Cuisine B", 9.99, "MED", 5, 2, 0.4, "false"),
+        (3, "Meal C", "Cuisine C", 10.99, "HIGH", 8, 2, 0.25, "false")
     ]
 
     # Call the get_leaderboard function
@@ -236,18 +236,18 @@ def test_get_leaderboard(mock_cursor):
 
     # Ensure the results match the expected output
     expected_result = [
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW"},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED"},
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH"}
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 10, "wins": 5, "win_pct": 0.5, "deleted": "false"},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 2, "win_pct": 0.4, "deleted": "false"},
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 8, "wins": 2, "win_pct": 0.25, "deleted": "false"}
     ]
 
     assert leaderboard == expected_result, f"Expected {expected_result}, but got {leaderboard}"
 
     # Ensure the SQL query was executed correctly
     expected_query = normalize_whitespace("""
-        SELECT id, meal, cuisine, price, difficulty
+        SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct 
         FROM meals
-        WHERE deleted = FALSE
+        WHERE deleted = false AND battles > 0 ORDER BY wins DESC
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
@@ -269,7 +269,7 @@ def test_get_leaderboard_empty(mock_cursor, caplog):
     assert "The leaderboard is empty." in caplog.text, "Expected warning about empty leaderboard not found in logs."
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals WHERE deleted = FALSE")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct FROM meals WHERE deleted = false AND battles > 0 ORDER BY wins DESC")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct
@@ -280,28 +280,28 @@ def test_get_all_meals_ordered(mock_cursor):
 
     # Simulate that there are multiple meals in the database
     mock_cursor.fetchall.return_value = [
-        {3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4},
-        {1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6},
-        {2, "Meal B", "Cuisine B", 9.99, "MED",  4, 2, 0.5}
+        {3, "Meal C", "Cuisine C", 10.99, "HIGH", 10, 4, 0.4, "false"},
+        {1, "Meal A", "Cuisine A", 8.99, "LOW", 5, 3, 0.6, "false"},
+        {2, "Meal B", "Cuisine B", 9.99, "MED",  4, 2, 0.5, "false"}
     ]
 
     # Call the get_leaderboard function with sort_by = True
-    meals = get_leaderboard(sort_by="price")
+    meals = get_leaderboard(sort_by="win")
 
     # Ensure the results are sorted by wins
     expected_result = [
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH"},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED"},
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW"}
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 10.99, "difficulty": "HIGH", "battles": 10, "wins": 4, "win_pct": 0.4, "deleted": "false"},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 9.99, "difficulty": "MED", "battles": 5, "wins": 3, "win_pct": 0.6, "deleted": "false"},
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 8.99, "difficulty": "LOW", "battles": 4, "wins":  2, "win_pct": 0.5, "deleted": "false"}
     ]
 
     assert meals == expected_result, f"Expected {expected_result}, but got {meals}"
 
     # Ensure the SQL query was executed correctly
     expected_query = normalize_whitespace("""
-        SELECT id, meal, cuisine, price, difficulty
+        SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct 
         FROM meals
-        WHERE deleted = FALSE
+        WHERE deleted = false AND battles > 0 
         ORDER BY wins DESC
     """)
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
@@ -335,7 +335,7 @@ def test_get_random_meal(mock_cursor, mocker):
     mock_random.assert_called_once_with(3)
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals WHERE deleted = FALSE")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct FROM meals WHERE deleted = false AND battles > 0 ORDER BY wins DESC")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct
@@ -355,7 +355,7 @@ def test_get_random_meal_empty(mock_cursor, mocker):
     mocker.patch("meal_max.models.kitchen_model.get_random").assert_not_called()
 
     # Ensure the SQL query was executed correctly
-    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty FROM meals WHERE deleted = FALSE")
+    expected_query = normalize_whitespace("SELECT id, meal, cuisine, price, difficulty, battles, wins, (wins * 1.0 / battles) AS win_pct FROM meals WHERE deleted = false AND battles > 0 ORDER BY wins DESC")
     actual_query = normalize_whitespace(mock_cursor.execute.call_args[0][0])
 
     # Assert that the SQL query was correct
@@ -369,7 +369,7 @@ def test_update_meal_stats(mock_cursor):
 
     # Call the update_meal_stats function with a sample meal ID
     meal_id = 1
-    update_meal_stats(meal_id, 8.99)
+    update_meal_stats(meal_id, "win")
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
@@ -398,7 +398,7 @@ def test_update_wins_deleted_meal(mock_cursor):
 
     # Expect a ValueError when attempting to update a deleted meal
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
-        update_meal_stats(1, price=8.99)
+        update_meal_stats(1, result="win")
 
     # Ensure that no SQL query for updating play count was executed
     mock_cursor.execute.assert_called_once_with("SELECT deleted FROM meals WHERE id = ?", (1,))

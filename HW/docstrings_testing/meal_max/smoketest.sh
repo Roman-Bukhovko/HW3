@@ -235,6 +235,9 @@ get_meal_by_id 1
 get_meal_by_name "Borscht"
 get_random_meal
 
+move_meal_to_top "Burger" "American" 9.99 "LOW"
+move_meal_to_bottom "Burger" "American" 9.99 "LOW"
+
 get_leaderboard
 
 echo "All tests passed successfully!"
