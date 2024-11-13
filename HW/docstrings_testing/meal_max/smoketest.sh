@@ -216,6 +216,80 @@ get_leaderboard() {
     exit 1
   fi
 }
+######################################################
+#
+# Battle Management
+#
+######################################################
+
+#Function to clear combatants
+clear_combatants() {
+  echo "Clearing combatants..."
+  response=$(curl -s -X POST "$BASE_URL/clear-combatants")
+  if echo"$response" | grep -q '"status": "success"'; then
+    echo "Playlist cleared successfully."
+  else
+    echo "Failed to clear combatants."
+    exit 1
+  fi
+}
+
+#Function to prep combatants for battle
+
+prep_combatant() {
+  echo "Preparing combatant with Meal ..."
+  response=$(curl -s -X POST "$BASE_URL/prep-combatant" \             -H "Content-Type: application/json" \                                  -d "{\"meal\": \"$meal\", \"cuisine\": \"$cuisine\", \"price\": $price, \"difficulty\": \"$difficulty\"}")
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Combatant prepped for battle"
+  else 
+    echo "Failed to prep combatant."
+    exit 1
+  fi
+}
+
+#Function to get the battle score of a meal
+
+get_battle_score() {
+  echo "Getting battle score..."
+  response=$(curl -s -X GET "$BASE_URL/get-battle-score/$meal_id")
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Battle score retrieved successfully."
+    if [ "$ECHO_JSON" = true ]; then
+      echo "Battle score JSON:"
+      echo "$response" | jq .
+    fi
+  else 
+    echo "Failed to get battle score"
+    exit 1
+  fi
+}
+
+#Function to get combatants
+
+get_combatants() {
+  echo "Getting combatants list..."
+  response=$(curl -s -X GET "$BASE_URL/get-combatants")
+  if echo "$response" | grep -q '"status": "success"'; then
+    combatants=$(echo "$response" | jq -r '.combatants[] | .meal')
+    echo "Current combatant: $combatants"
+  else
+    echo "Failed to retrieve combatants"
+    exit 1
+  fi
+}
+#Funtion to battle
+
+battle() {
+  echo "First battle..."
+  response=$(curl -s -X POST "$BASE_URL/start")
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Battle completed"
+    winner=$(echo "$response" | jq -r '.winner')
+    echo "The winner is: $winner"
+  else 
+    echo "Battle failed"
+    exit 1
+  fi
 
 
 # Health checks
@@ -237,4 +311,17 @@ get_random_meal
 
 get_leaderboard
 
+#Battle
+
+clear_combatants
+
+prep_combatant 1 "Pasta" "Italian" 7.99 "MED"
+prep_combatant 2 "Tacos" "Mexican" 2.99 "LOW"
+
+get_combatants
+
+get_battle_score 1 "Pasta" "Italian" 7.99 "MED"
+get_battle_score 2 "Tacos" "Mexican" 2.99 "LOW"
+
+battle
 echo "All tests passed successfully!"
