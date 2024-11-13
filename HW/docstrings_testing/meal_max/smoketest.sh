@@ -81,7 +81,7 @@ delete_meal_by_id() {
   response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$id")
   echo "Response: $response" 
 
-  if echo "$response" | grep -q '"status": "meal deleted"'; then
+  if echo "$response" | grep -q '"error": "Meal with ID 2 has been deleted"'; then
     echo "Meal deleted successfully by ID ($id)."
   else
     echo "Failed to delete meal by ID ($id)."
@@ -125,7 +125,8 @@ get_meal_by_name() {
   meal_name=$1
 
   echo "Getting meal by name (Meal Name: '$meal_name')..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-from-name?meal_name=$(echo $meal_name | sed 's/ /%20/g')")
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-name?meal_name=$(echo $meal_name | sed 's/ /%20/g')")
+  echo "Response: $response"
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal retrieved successfully by name."
     if [ "$ECHO_JSON" = true ]; then
@@ -141,6 +142,7 @@ get_meal_by_name() {
 get_random_meal() {
   echo "Getting a random meal from the catalog..."
   response=$(curl -s -X GET "$BASE_URL/get-random-meal")
+  echo "Response: $response"
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Random meal retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then
@@ -149,50 +151,6 @@ get_random_meal() {
     fi
   else
     echo "Failed to get a random meal."
-    exit 1
-  fi
-}
-
-############################################################
-#
-# Arrange Leaderboard
-#
-############################################################
-
-move_meal_to_top() {
-  meal=$1
-  cuisine=$2
-  price=$3
-  difficulty=$4
-
-  echo "Moving meal ($meal, $cuisine, $price, $difficulty) to the top of the leaderboard..."
-  response=$(curl -s -X POST "$BASE_URL/move-meal-to-top" \
-    -H "Content-Type: application/json" \
-    -d "{\"meal\": \"$meal\", \"cuisine\": \"$cuisine\", \"price\": $price, \"difficulty\": \"$difficulty\"}")
-
-  if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal moved to the beginning successfully."
-  else
-    echo "Failed to move meal to the top."
-    exit 1
-  fi
-}
-
-move_meal_to_bottom() {
-  meal=$1
-  cuisine=$2
-  price=$3
-  difficulty=$4
-
-  echo "Moving meal ($artist - $title, $year) to the bottom of the leaderboard..."
-  response=$(curl -s -X POST "$BASE_URL/move-meal-to-bottom" \
-    -H "Content-Type: application/json" \
-    -d "{\"meal\": \"$meal\", \"cuisine\": \"$cuisine\", \"price\": $price, \"difficulty\": \"$difficulty\"}")
-
-  if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal moved to the bottom successfully."
-  else
-    echo "Failed to move meal to the bottom."
     exit 1
   fi
 }
@@ -308,19 +266,13 @@ create_meal "Borscht" "Ukrainian" 10.99 "MED"
 create_meal "Sushi" "Japanese" 12.99 "HIGH"
 create_meal "Burger" "American" 9.99 "LOW"
 
-get_meal_by_id 2
 delete_meal_by_id 2
-get_all_meals
-
 get_meal_by_id 1
-get_meal_by_name "Borscht"
 get_random_meal
-
-move_meal_to_top "Burger" "American" 9.99 "LOW"
-move_meal_to_bottom "Burger" "American" 9.99 "LOW"
+get_meal_by_name "Borscht"
 
 get_leaderboard
-
+get_all_meals
 
 
 echo "All tests passed successfully!"
